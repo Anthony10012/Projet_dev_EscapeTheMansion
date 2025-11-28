@@ -2,7 +2,7 @@ import pygame
 import pygame_menu
 import sys
 
-from pygame_menu.examples.other.image_background import background_image
+
 
 # -------------------------------------------------------
 # Initialisation générale de Pygame
