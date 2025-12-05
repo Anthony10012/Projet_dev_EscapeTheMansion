@@ -1,8 +1,6 @@
 import pygame
 
 # Liste des couleurs qui empêche le joueur de traverser(Collision)
-
-
 obstacle_colors= [
     (32,29,47),
     (0,0,0),

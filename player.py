@@ -72,7 +72,7 @@ class Player:
         ]
 
         for px, py in pieds:
-            if check_collision_with_color(surface, px, py):  # ta fonction externe
+            if check_collision_with_color(surface, px, py):
                 return True
 
         return False
