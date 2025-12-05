@@ -1,6 +1,8 @@
 import pygame
 import pygame_menu
 import sys
+from map import *
+
 
 
 
@@ -65,17 +67,14 @@ def pause_menu(surface, FONT, BIG_FONT):
 # ----------------------
 # Boucle de jeu
 # ----------------------
-def start_game(screen, FONT, BIG_FONT, player, background):
+def start_game(screen, FONT, BIG_FONT, player, map1, map2, map3):
     clock = pygame.time.Clock()
     running = True
+    current_map = map1  # map de départ
 
     while running:
-        keys = pygame.key.get_pressed()
-        player.update(keys,background)
-
-        print(player.x, player.y)
-
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -84,20 +83,30 @@ def start_game(screen, FONT, BIG_FONT, player, background):
                 if action == 'resume':
                     continue
 
-        screen.blit(background, (0, 0))
-        player.draw()
+        keys = pygame.key.get_pressed()
+        player.update(keys)
+        print(player.x, player.y)
 
-        info = FONT.render("Le jeu tourne - appuyez sur ESC pour pause", True, (200, 200, 200))
+        # Changement de map si nécessaire
+        current_map = Map.switch_map(current_map, player, map1, map2, map3)
+
+        # Dessin
+        current_map.draw(screen)  # background + objets
+        player.draw()             # joueur par-dessus
+
+        # Info ou menu overlay
+        info = FONT.render("Appuyez sur ESC pour pause", True, (200, 200, 200))
         screen.blit(info, (20, 20))
 
         pygame.display.flip()
         clock.tick(60)
 
 
+
 # ----------------------
 # Menu principal
 # ----------------------
-def create_menu(screen, FONT, BIG_FONT, player, background):
+def create_menu(screen, FONT, BIG_FONT, player, map1,map2,map3):
     import pygame_menu
 
     custom_theme = pygame_menu.Theme(
@@ -119,7 +128,7 @@ def create_menu(screen, FONT, BIG_FONT, player, background):
         theme=custom_theme
     )
 
-    menu.add.button("PLay", lambda: start_game(screen, FONT, BIG_FONT, player, background))
+    menu.add.button("PLay", lambda: start_game(screen, FONT, BIG_FONT, player, map1, map2, map3))
     menu.add.button("Quit", pygame_menu.events.EXIT)
 
     return menu
