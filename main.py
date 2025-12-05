@@ -2,6 +2,7 @@ import pygame
 import sys
 from player import Player
 from menu import create_menu
+from collision_player import *
 
 pygame.init()
 
@@ -25,6 +26,7 @@ clock = pygame.time.Clock()
 running = True
 while running:
     events = pygame.event.get()
+
     for event in events:
         if event.type == pygame.QUIT:
             running = False
@@ -33,7 +35,9 @@ while running:
     menu.update(events)
     menu.draw(screen)
 
+
     pygame.display.flip()
+
     clock.tick(60)
 
 pygame.quit()

@@ -1,6 +1,9 @@
 import pygame
 import os
 
+from collision_player import check_collision_with_color
+
+
 class Player:
     def __init__(self, screen, dossier_perso):
         self.screen = screen
@@ -56,10 +59,31 @@ class Player:
         return self.current_animation[int(self.frame_index)]
 
     # --------------------------
+    # COLLISION PAR LES PIEDS
+    # --------------------------
+    def collision_pieds(self, surface):
+        rect = self.get_rect()
+
+        # Coordonnées des pieds (point central + gauche + droite)
+        pieds = [
+            (rect.centerx, rect.bottom),
+            (rect.left + 10, rect.bottom),
+            (rect.right - 10, rect.bottom)
+        ]
+
+        for px, py in pieds:
+            if check_collision_with_color(surface, px, py):  # ta fonction externe
+                return True
+
+        return False
+
+    # --------------------------
     # Déplacer le joueur
     # --------------------------
-    def update(self, keys):
+    def update(self, keys,surface):
+        old_x,old_y = self.x, self.y
         en_mouvement = False
+
 
         # Déplacements
         if keys[pygame.K_UP]:
@@ -67,6 +91,7 @@ class Player:
             self.current_animation = self.animations["walk_back"]
             self.derniere_direction = "back"
             en_mouvement = True
+
 
         elif keys[pygame.K_DOWN]:
             self.y += self.vitesse
@@ -80,12 +105,16 @@ class Player:
             self.derniere_direction = "left"
             en_mouvement = True
 
+
         elif keys[pygame.K_RIGHT]:
             self.x += self.vitesse
             self.current_animation = self.animations["walk_right"]
             self.derniere_direction = "right"
             en_mouvement = True
 
+
+        if self.collision_pieds(surface):
+            self.x, self.y = old_x, old_y
         # Pas en mouvement → idle
         if not en_mouvement:
             self.current_animation = self.animations[f"idle_{self.derniere_direction}"]
@@ -96,3 +125,8 @@ class Player:
     def draw(self):
         frame = self.get_frame()
         self.screen.blit(frame, (self.x, self.y))
+
+
+    def get_rect(self):
+        frame = self.get_frame()
+        return pygame.Rect(self.x,self.y,frame.get_width(),frame.get_height())
