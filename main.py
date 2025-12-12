@@ -33,10 +33,23 @@ tiroir1 = pygame.image.load("./design/Items/tiroire_chambre.png").convert_alpha(
 tiroir1 = pygame.transform.scale(tiroir1, (190, 190))
 tiroir2 = pygame.image.load("./design/Items/Tiroir_Couloir.png").convert_alpha()
 tiroir2 = pygame.transform.scale(tiroir2, (190, 190))
+porte_chambre = pygame.image.load("./design/Items/porte_chambre.png").convert_alpha()
+porte_chambre = pygame.transform.scale(porte_chambre, (28, 82))
+
+tiroir_obj= GameObject(tiroir1,60,80,name="tiroir")
+tiroir_obj.contains_item = "clé de la chambre"
+tiroir_obj.item_taken = False
+
+porte_chambre_obj= GameObject(porte_chambre,20,270,name="porte")
+porte_chambre_obj.locked = True
+porte_chambre_obj.requires_item = "clé de la chambre"
+
+
+
 
 
 obj1 = GameObject(lit, 570, 100)
-obj2 = GameObject(tiroir1, 60, 80)
+obj2 = tiroir_obj
 obj3 = GameObject(tiroir2, 300, 80)
 obj4 = GameObject(tiroir2, 350, 250)
 obj5 = GameObject(tiroir2, 400, 80)
@@ -46,10 +59,11 @@ obj8 = GameObject(tiroir2, 250, 80)
 obj9 = GameObject(tiroir2, 200, 80)
 obj10 = GameObject(tiroir2, 150, 80)
 obj11 = GameObject(tiroir2, 100, 80)
+obj12 = GameObject(porte_chambre, 20, 270)
 
 
 #les Maps
-map1 = Map(800, 600, background, "map1", [obj1, obj2])
+map1 = Map(800, 600, background, "map1", [obj1, obj2,porte_chambre_obj])
 map2 = Map(800, 600, background_2, "map2", [obj3,obj7,obj11])
 map3 = Map(800, 600, background_3, "map3", [obj4,obj6])
 

@@ -1,6 +1,8 @@
 import pygame
 import pygame_menu
 import sys
+
+from Objets import GameObject
 from map import *
 
 
@@ -94,6 +96,30 @@ def start_game(screen, FONT, BIG_FONT, player, map1, map2, map3):
         current_map.draw(screen)# background + objets
 
         player.draw()             # joueur par-dessus
+
+        for obj in current_map.objects:
+            if obj.interact(player.feet):
+                # ---- Récupération d’un item dans un objet ----
+                if hasattr(obj, "contains_item") and not getattr(obj, "item_taken", False):
+                    txt = FONT.render(f"Appuyez sur E pour prendre {obj.contains_item}", True, (255, 255, 255))
+                    screen.blit(txt, (player.rect.x - 40, player.rect.y - 40))
+                    if keys[pygame.K_e]:
+                        player.inventory.append(obj.contains_item)
+                        obj.item_taken = True
+                        print(f"{obj.contains_item} récupérée !")
+
+                # ---- Porte verrouillée ----
+                elif hasattr(obj, "locked") and obj.locked:
+                    if hasattr(obj, "requires_item") and obj.requires_item in player.inventory:
+                        txt = FONT.render("Appuyez sur E pour ouvrir la porte", True, (255, 255, 255))
+                        screen.blit(txt, (player.rect.x - 40, player.rect.y - 40))
+                        if keys[pygame.K_e]:
+                            obj.locked = False
+                            print("Porte ouverte !")
+                            current_map.objects.remove(obj)
+                    else:
+                        txt = FONT.render("La porte est verrouillée", True, (255, 0, 0))
+                        screen.blit(txt, (player.rect.x - 40, player.rect.y - 40))
 
         # Info ou menu overlay
         info = FONT.render("Appuyez sur ESC pour pause", True, (200, 200, 200))
