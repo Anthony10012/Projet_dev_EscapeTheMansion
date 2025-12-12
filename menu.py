@@ -85,7 +85,7 @@ def start_game(screen, FONT, BIG_FONT, player, map1, map2, map3):
 
         keys = pygame.key.get_pressed()
         player.update(keys, current_map.get_surface(), current_map.objects)
-        print(player.x, player.y)
+        print(player.rect.x, player.rect.y)
 
         # Changement de map si nécessaire
         current_map = Map.switch_map(current_map, player, map1, map2, map3)
