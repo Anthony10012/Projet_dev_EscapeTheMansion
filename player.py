@@ -8,30 +8,43 @@ class Player:
     def __init__(self, screen, dossier_perso):
         self.screen = screen
 
-        # Position
+        # Position réelle du joueur
         self.x = 368
         self.y = 268
         self.vitesse = 2
+
+        # Le sprite fait 128x128 → rect doit faire la même taille
+        self.rect = pygame.Rect(self.x, self.y, 128, 128)
 
         # Animation
         self.frame_index = 0
         self.frame_speed = 0.03
         self.derniere_direction = "front"
 
-        # Chargement animation
+        # Chargement des animations
         self.animations = {
             "idle_left":  self.charger_animation(dossier_perso, ["idle_0.png", "idle1.png"]),
             "idle_right": self.charger_animation(dossier_perso, ["idle_0_right.png", "idle1_right.png"]),
             "idle_front": self.charger_animation(dossier_perso, ["idle0_front.png", "idle1_front.png"]),
             "idle_back":  self.charger_animation(dossier_perso, ["idle0_back.png", "idle1_back.png"]),
 
-            "walk_front": self.charger_animation(dossier_perso, ["front_walk0.png", "front_walk1.png", "front_walk2.png", "front_walk3.png", "front_walk4.png", "front_walk5.png"]),
-            "walk_back":  self.charger_animation(dossier_perso, ["back_walk0.png", "back_walk1.png", "back_walk2.png", "back_walk3.png", "back_walk4.png", "back_walk5.png"]),
+            "walk_front": self.charger_animation(dossier_perso, [
+                "front_walk0.png", "front_walk1.png", "front_walk2.png",
+                "front_walk3.png", "front_walk4.png", "front_walk5.png"
+            ]),
+            "walk_back":  self.charger_animation(dossier_perso, [
+                "back_walk0.png", "back_walk1.png", "back_walk2.png",
+                "back_walk3.png", "back_walk4.png", "back_walk5.png"
+            ]),
             "walk_left":  self.charger_animation(dossier_perso, ["walk_left0.png", "walk_left1.png"]),
             "walk_right": self.charger_animation(dossier_perso, ["walk_right1.png", "walk_right0.png"])
         }
 
         self.current_animation = self.animations["idle_front"]
+
+        # Rectangle des pieds (pour collisions)
+        # → centré sous le joueur (sprite 128 px)
+        self.feet = pygame.Rect(self.x + 54, self.y + 118, 20, 10)
 
     def charger_animation(self, dossier, noms_images, taille=(128, 128)):
         frames = []
@@ -48,75 +61,81 @@ class Player:
             self.frame_index = 0
         return self.current_animation[int(self.frame_index)]
 
-    # --------------------------
-    # COLLISION PAR LES PIEDS
-    # --------------------------
-    def collision_pieds(self, surface):
-        rect = self.get_rect()
+    # ------------------------------------------------------------
+    #      COLLISION
+    # ------------------------------------------------------------
+    def collision_pieds(self, surface, objects):
+        px, py = self.feet.center
 
-        # Coordonnées des pieds (point central + gauche + droite)
-        pieds = [
-            (rect.centerx, rect.bottom),
-            (rect.left + 10, rect.bottom),
-            (rect.right - 10, rect.bottom)
-        ]
+        # Collision par couleur sur la map
+        if check_collision_with_color(surface, px, py):
+            return True
 
-        for px, py in pieds:
-            if check_collision_with_color(surface, px, py):  # ta fonction externe
+        # Collision avec les objets
+        for obj in objects:
+            if self.feet.colliderect(obj.rect):
                 return True
 
         return False
 
-    # --------------------------
-    # Déplacer le joueur
-    # --------------------------
-    def update(self, keys,surface):
-        old_x,old_y = self.x, self.y
+    # ------------------------------------------------------------
+    #      MISE À JOUR DU JOUEUR
+    # ------------------------------------------------------------
+    def update(self, keys, map_surface, map_objects):
         en_mouvement = False
 
+        # ---------- SAUVEGARDE ----------
+        old_x = self.rect.x
+        old_y = self.rect.y
 
-        # Déplacements
-        if keys[pygame.K_UP]:
-            self.y -= self.vitesse
-            self.current_animation = self.animations["walk_back"]
-            self.derniere_direction = "back"
-            en_mouvement = True
-
-
-        elif keys[pygame.K_DOWN]:
-            self.y += self.vitesse
-            self.current_animation = self.animations["walk_front"]
-            self.derniere_direction = "front"
-            en_mouvement = True
-
-        elif keys[pygame.K_LEFT]:
-            self.x -= self.vitesse
+        # ---------- MOUVEMENT AXE X ----------
+        if keys[pygame.K_LEFT]:
+            self.rect.x -= self.vitesse
             self.current_animation = self.animations["walk_left"]
             self.derniere_direction = "left"
             en_mouvement = True
 
-
-        elif keys[pygame.K_RIGHT]:
-            self.x += self.vitesse
+        if keys[pygame.K_RIGHT]:
+            self.rect.x += self.vitesse
             self.current_animation = self.animations["walk_right"]
             self.derniere_direction = "right"
             en_mouvement = True
 
+        # update feet
+        self.feet.x = self.rect.x + 54
+        self.feet.y = self.rect.y + 118
 
-        if self.collision_pieds(surface):
-            self.x, self.y = old_x, old_y
-        # Pas en mouvement → idle
+        # collision sur X → rollback seulement X
+        if self.collision_pieds(map_surface, map_objects):
+            self.rect.x = old_x
+
+        # ---------- MOUVEMENT AXE Y ----------
+        if keys[pygame.K_UP]:
+            self.rect.y -= self.vitesse
+            self.current_animation = self.animations["walk_back"]
+            self.derniere_direction = "back"
+            en_mouvement = True
+
+        if keys[pygame.K_DOWN]:
+            self.rect.y += self.vitesse
+            self.current_animation = self.animations["walk_front"]
+            self.derniere_direction = "front"
+            en_mouvement = True
+
+        # update feet
+        self.feet.x = self.rect.x + 54
+        self.feet.y = self.rect.y + 118
+
+        # collision sur Y → rollback seulement Y
+        if self.collision_pieds(map_surface, map_objects):
+            self.rect.y = old_y
+
+        # ---------- IDLE ----------
         if not en_mouvement:
             self.current_animation = self.animations[f"idle_{self.derniere_direction}"]
 
-    @property
-    def rect(self):
-        return pygame.Rect(self.x, self.y, 64, 64)
-
+    # ------------------------------------------------------------
+    #      AFFICHAGE
+    # ------------------------------------------------------------
     def draw(self):
-        self.screen.blit(self.get_frame(), (self.x, self.y))
-
-
-    def get_rect(self):
-        frame = self.get_frame()
-        return pygame.Rect(self.x,self.y,frame.get_width(),frame.get_height())
+        self.screen.blit(self.get_frame(), (self.rect.x, self.rect.y))

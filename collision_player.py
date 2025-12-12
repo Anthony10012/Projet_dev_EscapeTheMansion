@@ -4,7 +4,7 @@ import pygame
 
 
 obstacle_colors= [
-    (32,29,47),
+    (50,41,71),
     (0,0,0),
     (43,36,60)]
 

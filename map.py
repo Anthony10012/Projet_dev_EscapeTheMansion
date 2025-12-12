@@ -17,28 +17,29 @@ class Map:
 
     @staticmethod
     def switch_map(current_map, player, map1, map2, map3):
-        # Map 1 → Map 2
         if current_map == map1 and player.rect.x <= 0:
-            player.x = 650
+            player.rect.x = 650
+            player.rect.y = 268  # assure-toi d'être en dehors d'un obstacle
             return map2
-
-        # Map 2 → Map 3
         elif current_map == map2:
             if player.rect.x <= 0:
-                player.x = 650
-                player.y = 356
+                player.rect.x = map3.width - 64
+                player.rect.y = 268
                 return map3
-            elif player.rect.x > 650:
-                player.x = 10
+            elif player.rect.x > map2.width:
+                player.rect.x = 0
+                player.rect.y = 268
                 return map1
-
-        # Map 3 → Map 2
-        elif current_map == map3 and player.rect.x > 650:
-            player.x = 10
-            player.y = 212
+        elif current_map == map3 and player.rect.x > map3.width:
+            player.rect.x = 0
+            player.rect.y = 268
             return map2
-
         return current_map
+
+
+    def get_surface(self):
+        return self.bg_image
+
 
 
 

@@ -74,7 +74,7 @@ while running:
             running = False
 
     keys = pygame.key.get_pressed()
-    player.update(keys)
+    player.update(keys,  current_map.get_surface(), current_map.objects)
 
     # Changement de map si nécessaire
     current_map = Map.switch_map(current_map, player, map1, map2, map3)
