@@ -12,7 +12,7 @@ class Player:
         self.x = 368
         self.y = 268
         self.vitesse = 2
-
+        self.inventory = []
         # Le sprite fait 128x128 → rect doit faire la même taille
         self.rect = pygame.Rect(self.x, self.y, 128, 128)
 
