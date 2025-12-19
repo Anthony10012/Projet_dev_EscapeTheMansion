@@ -6,7 +6,51 @@ from Objets import GameObject
 from map import *
 
 
+# ----------------------
+# Cinématique de fin
+# ----------------------
+def exit_cutscene(screen, current_map, player, target_x, target_y):
+    player.can_move = False
+    clock = pygame.time.Clock()
+    font_end = pygame.font.Font(None, 74)
 
+    speed = 2
+    moving = True
+
+    while moving:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # DEPLACEMENT SUR L'AXE Y (Vertical)
+        if abs(player.rect.y - target_y) > speed:
+            if player.rect.y > target_y:
+                player.rect.y -= speed  # Monte vers le haut
+            else:
+                player.rect.y += speed  # Descend vers le bas
+        else:
+            moving = False
+
+        # Redessine le jeu pendant le mouvement
+        current_map.draw(screen)
+        player.draw()
+        pygame.display.flip()
+        clock.tick(60)
+
+    # --- Message de fin ---
+    overlay = pygame.Surface((800, 600), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 200))
+    screen.blit(overlay, (0, 0))
+
+    txt = font_end.render("FÉLICITATIONS ! TU ES LIBRE !", True, (255, 255, 255))
+    text_rect = txt.get_rect(center=(400, 300))
+    screen.blit(txt, text_rect)
+
+    pygame.display.flip()
+    pygame.time.delay(4000)
+    pygame.quit()
+    sys.exit()
 
 
 # ----------------------
@@ -66,6 +110,7 @@ def pause_menu(surface, FONT, BIG_FONT):
         clock.tick(60)
 
 
+
 # ----------------------
 # Boucle de jeu
 # ----------------------
@@ -92,8 +137,10 @@ def start_game(screen, FONT, BIG_FONT, player, map1, map2, map3):
         # Changement de map si nécessaire
         current_map = Map.switch_map(current_map, player, map1, map2, map3)
 
+
         # Dessin
         current_map.draw(screen)# background + objets
+
 
         player.draw()             # joueur par-dessus
 
@@ -111,12 +158,22 @@ def start_game(screen, FONT, BIG_FONT, player, map1, map2, map3):
                 # ---- Porte verrouillée ----
                 elif hasattr(obj, "locked") and obj.locked:
                     if hasattr(obj, "requires_item") and obj.requires_item in player.inventory:
-                        txt = FONT.render("Appuyez sur E pour ouvrir la porte", True, (255, 255, 255))
+                        txt = FONT.render("Appuyez sur E pour sortir !", True, (255, 255, 255))
                         screen.blit(txt, (player.rect.x - 40, player.rect.y - 40))
                         if keys[pygame.K_e]:
                             obj.locked = False
-                            print("Porte ouverte !")
-                            current_map.objects.remove(obj)
+                            print("la porte finale s'ouvre...")
+
+                            if obj.name == "porte sortie":
+                                current_map.objects.remove(obj)
+
+                                porte_centre_x = obj.rect.x + (obj.image.get_width() // 2)
+
+                                player.rect.centerx = porte_centre_x
+                                exit_cutscene(screen, current_map,player,player.rect.x,150)
+
+                            else:
+                                current_map.objects.remove(obj)
                     else:
                         txt = FONT.render("La porte est verrouillée", True, (255, 0, 0))
                         screen.blit(txt, (player.rect.x - 40, player.rect.y - 40))
@@ -155,7 +212,7 @@ def create_menu(screen, FONT, BIG_FONT, player, map1,map2,map3):
         theme=custom_theme
     )
 
-    menu.add.button("PLay", lambda: start_game(screen, FONT, BIG_FONT, player, map1, map2, map3))
+    menu.add.button("Play", lambda: start_game(screen, FONT, BIG_FONT, player, map1, map2, map3))
     menu.add.button("Quit", pygame_menu.events.EXIT)
 
     return menu

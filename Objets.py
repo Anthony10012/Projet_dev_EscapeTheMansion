@@ -8,6 +8,9 @@ class GameObject:
         self.name = name
         self.gives_item = gives_item
 
+
+
+
     def draw(self, screen):
         if not self.picked:
             screen.blit(self.image, self.rect)
