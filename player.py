@@ -9,8 +9,14 @@ class Player:
         self.screen = screen
 
         # Position réelle du joueur
-        self.x = 368
-        self.y = 268
+        # Position de départ du joueur
+        self.start_x = 368
+        self.start_y = 268
+
+        # Position courante
+        self.x = self.start_x
+        self.y = self.start_y
+
         self.vitesse = 2
         self.inventory = []
         # Le sprite fait 128x128 → rect doit faire la même taille
@@ -133,6 +139,17 @@ class Player:
         # ---------- IDLE ----------
         if not en_mouvement:
             self.current_animation = self.animations[f"idle_{self.derniere_direction}"]
+
+
+    #-------------
+    #reset
+    #-------------
+    def reset(self):
+        self.rect.x = self.start_x
+        self.rect.y = self.start_y
+        self.feet.x = self.rect.x + 54
+        self.feet.y = self.rect.y + 118
+        self.inventory.clear()
 
     # ------------------------------------------------------------
     #      AFFICHAGE
