@@ -80,7 +80,7 @@ obj11 = cle_sortie_obj
 
 #les Maps
 map1 = Map(800, 600, background, "map1", [obj1, obj2,porte_chambre_obj])
-map2 = Map(800, 600, background_2, "map2", [obj3,obj7,cle_sortie_obj])
+map2 = Map(800, 600, background_2, "map2", [obj3,obj7,obj11])
 map3 = Map(800, 600, background_3, "map3", [obj4,obj6,porte_sortie_obj])
 
 # Le menu
