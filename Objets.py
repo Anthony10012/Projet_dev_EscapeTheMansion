@@ -17,3 +17,5 @@ class GameObject:
 
     def interact(self, player_rect):
         return self.rect.colliderect(player_rect.inflate(40, 40))
+
+
