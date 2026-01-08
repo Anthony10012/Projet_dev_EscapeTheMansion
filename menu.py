@@ -174,7 +174,8 @@ def pause_menu(surface, FONT, BIG_FONT, player, current_map, maps):
     start_y = surface.get_height() // 2 - 60
     resume_rect = pygame.Rect(center_x - btn_w // 2, start_y, btn_w, btn_h)
     save_rect = pygame.Rect(center_x - btn_w // 2, start_y + 70, btn_w, btn_h)
-    quit_rect = pygame.Rect(center_x - btn_w // 2, start_y + 140, btn_w, btn_h)
+    controls_rect = pygame.Rect(center_x - btn_w // 2, start_y + 140, btn_w, btn_h)
+    quit_rect = pygame.Rect(center_x - btn_w // 2, start_y + 210, btn_w, btn_h)
 
     screenshot = surface.copy()
 
@@ -191,6 +192,8 @@ def pause_menu(surface, FONT, BIG_FONT, player, current_map, maps):
                     return 'resume'
                 if save_rect.collidepoint(mx, my):
                     sauvegarder(player, maps, current_map)
+                if controls_rect.collidepoint(mx, my):
+                    show_controls(surface, FONT)
                 if quit_rect.collidepoint(mx, my):
                     pygame.quit()
                     sys.exit()
@@ -205,11 +208,46 @@ def pause_menu(surface, FONT, BIG_FONT, player, current_map, maps):
 
         draw_button(surface, resume_rect, "Resume", FONT)
         draw_button(surface, save_rect, "Save Game", FONT)
+        draw_button(surface, controls_rect, "Controls", FONT)
         draw_button(surface, quit_rect, "Quit", FONT)
 
         pygame.display.flip()
         clock.tick(60)
 
+def show_controls(surface, FONT):
+    clock = pygame.time.Clock()
+    running = True
+    controls_text = [
+        "Move Up: UP",
+        "Move Down: DOWN",
+        "Move Left: LEFT",
+        "Move Right: RIGHT",
+        "Interaction:" "E",
+        "Pause: Esc",
+    ]
+    screenshot = surface.copy()
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                running = False
+
+        surface.blit(screenshot, (0, 0))
+        overlay = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        surface.blit(overlay, (0, 0))
+
+        y_offset = 100
+        for line in controls_text:
+            text_surf = FONT.render(line, True, (255, 255, 255))
+            surface.blit(text_surf, text_surf.get_rect(center=(surface.get_width() // 2, y_offset)))
+            y_offset += 50
+
+        pygame.display.flip()
+        clock.tick(60)
 
 # ----------------------
 # Réinitialisation complète
