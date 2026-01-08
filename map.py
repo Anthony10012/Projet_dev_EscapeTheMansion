@@ -8,11 +8,11 @@ class Map:
         self.bg_name = bg_name
         self.objects = objects if objects else []
 
-
-
     def draw(self, screen):
         screen.blit(self.bg_image, (0, 0))
         for obj in self.objects:
+            if hasattr(obj, "active") and not obj.active:
+                continue
             obj.draw(screen)
 
     @staticmethod
@@ -27,18 +27,12 @@ class Map:
                 player.rect.x = map3.width - player.rect.width
                 player.rect.y = player.rect.y + 128
                 return map3
-            elif current_map == map3:
-                player.rect.x = map2.width - player.rect.width
-                player.rect.y = 268
-                return map2
+
 
         # Sortie à droite
         elif player.rect.x + player.rect.width >= current_map.width:
-            if current_map == map1:
-                player.rect.x = 0
-                player.rect.y = 268
-                return map2
-            elif current_map == map2:
+
+            if current_map == map2:
                 player.rect.x = 0
                 player.rect.y = 222
                 return map1
@@ -51,6 +45,15 @@ class Map:
 
     def get_surface(self):
         return self.bg_image
+
+    def reset(self):
+        for obj in self.objects:
+            if hasattr(obj, "locked"):
+                obj.locked = True
+            if hasattr(obj, "item_taken"):
+                obj.item_taken = False
+            if hasattr(obj, "active"):
+                obj.active = True
 
 
 
