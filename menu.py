@@ -305,24 +305,28 @@ def start_game(screen, FONT, BIG_FONT, player, map1, map2, map3, start_map=None)
             if obj.interact(player.feet):
                 # Récupération d’item
                 if hasattr(obj, "contains_item") and not getattr(obj, "item_taken", False):
+                    txt = FONT.render("Appuyez sur E pour récupérer la clé", True, (255, 255, 255))
+                    screen.blit(txt, (player.rect.x - 60, player.rect.y - 40))
+
+                    if keys[pygame.K_e]:
                     # Détermine le chemin de l'image selon l'objet
-                    if obj.contains_item == "clé de la chambre":
-                        image_path = "./design/Items/clé_chambre.png"
-                    elif obj.contains_item == "clé de sortie":
-                        image_path = "./design/Items/clé_porte_sortie.png"
-                    else:
-                        image_path = None  # pour d'autres objets sans image
+                        if obj.contains_item == "clé de la chambre":
+                            image_path = "./design/Items/clé_chambre.png"
+                        elif obj.contains_item == "clé de sortie":
+                            image_path = "./design/Items/clé_porte_sortie.png"
+                        else:
+                            image_path = None  # pour d'autres objets sans image
 
-                    player.inventory.append({
-                        "name": obj.contains_item,
-                        "image_path": image_path
-                    })
-                    obj.item_taken = True
-                    print(f"{obj.contains_item} récupérée !")
+                        player.inventory.append({
+                            "name": obj.contains_item,
+                            "image_path": image_path
+                        })
+                        obj.item_taken = True
+                        print(f"{obj.contains_item} récupérée !")
 
 
-                    # --- Sauvegarde automatique lors de l'utilisation ---
-                    auto_save(player, maps, current_map)
+                        # --- Sauvegarde automatique lors de l'utilisation ---
+                        auto_save(player, maps, current_map)
 
                 # Porte verrouillée
                 elif hasattr(obj, "locked") and obj.locked:
