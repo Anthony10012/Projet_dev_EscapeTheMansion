@@ -5,17 +5,17 @@ name: Premier Workflow
 on: [push]
 # Un workflow contient un ou plusieurs "jobs" (tâches)
 jobs:
- # Nom de notre job (vous pouvez le choisir librement)
+# Nom de notre job (vous pouvez le choisir librement)
  dire-bonjour:
- # Sur quel système d'exploitation exécuter ce job ?
- runs-on: ubuntu-latest
+# Sur quel système d'exploitation exécuter ce job ?
+  runs-on: ubuntu-latest
  
- # Liste des étapes à exécuter dans ce job
- steps:
- # Première étape : afficher un message
+# Liste des étapes à exécuter dans ce job
+  steps:
+# Première étape : afficher un message
    - name: Etape 1
      run: echo "Bonjour classe ICT324 !"
 
-   # Deuxième étape : afficher un autre message
+# Deuxième étape : afficher un autre message
    - name: Etape 2
      run: echo "Ceci est mon premier workflow automatisé."
