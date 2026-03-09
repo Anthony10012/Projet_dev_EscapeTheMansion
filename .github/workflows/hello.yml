@@ -19,4 +19,3 @@ jobs:
    # Deuxième étape : afficher un autre message
    - name: Etape 2
      run: echo "Ceci est mon premier workflow automatisé."
-   - name: Etape 3
